@@ -1,0 +1,222 @@
+<!-- Netlify HTML/JavaScript Code (index.html) -->
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form - WhatsApp & Google Sheet</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="max-w-md w-full bg-slate-800 rounded-2xl shadow-2xl p-8 border border-slate-700">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-emerald-400">Get Access</h1>
+            <p class="text-sm text-slate-400 mt-1">Your all companies franchise link</p>
+        </div>
+
+        <form id="whatsappForm" class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">पूरा नाम (Full Name)</label>
+                <input type="text" id="name" required placeholder="अपना नाम दर्ज करें"
+                    class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-100">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-slate-300 mb-1">मोबाइल नंबर (Mobile Number)</label>
+                <input type="tel" id="mobile" required placeholder="10 अंकों का मोबाइल नंबर"
+                    class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 text-slate-100">
+            </div>
+
+            <button type="submit" id="submitBtn"
+                class="w-full py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl shadow-lg transition duration-200 flex items-center justify-center space-x-2">
+                <span id="btnText">Submit</span>
+                <span id="loader" class="hidden animate-spin rounded-full h-5 w-5 border-b-2 border-white"></span>
+            </button>
+        </form>
+        <div id="statusMessage" class="mt-4 text-center text-sm hidden"></div>
+    </div>
+
+    <script>
+        // ⚠️ YAHAN APNA ASLI APPS SCRIPT WEB APP URL DAALO (Code.gs deploy karne ke baad jo URL milega)
+        // Ye URL ".../exec" pe end hona chahiye, "YOUR_ID" jaisa placeholder nahi
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbza1BVVjZeD8LCTNB0YBVoP1dp5rpPSej0nNDkegZlT0tknueOVbT2NmGBxVfePV95VHQ/exec";
+        const WHATSAPP_NUMBER = "919428327349";
+
+        document.getElementById('whatsappForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const mobile = document.getElementById('mobile').value.trim();
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loader = document.getElementById('loader');
+            const statusMessage = document.getElementById('statusMessage');
+
+            // Basic validation
+            if (!/^\d{10}$/.test(mobile)) {
+                statusMessage.textContent = "⚠️ कृपया सही 10 अंकों का मोबाइल नंबर डालें।";
+                statusMessage.className = "mt-4 text-center text-sm text-red-400 font-medium";
+                statusMessage.classList.remove('hidden');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            btnText.textContent = "डेटा सेव हो रहा है...";
+            loader.classList.remove('hidden');
+            statusMessage.classList.add('hidden');
+
+            try {
+                // no-cors mode me response padh nahi sakte, lekin agar URL sahi hai aur
+                // doPost() Apps Script me maujood hai to request server tak pahunch jaati hai
+                // aur sheet me row add ho jaati hai (chahe yahan JS ko success/fail pata na chale).
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ name, mobile })
+                });
+
+                statusMessage.textContent = "✓ डेटा सफलतापूर्वक Google Sheet में सेव हो गया! WhatsApp खुल रहा है...";
+                statusMessage.className = "mt-4 text-center text-sm text-emerald-400 font-medium";
+                statusMessage.classList.remove('hidden');
+
+                const customWhatsappText =
+`August  Month Live Campaign 
+
+1.*Angel one*
+https://a.aonelink.in/ANGOne/LEgtv3i
+
+
+2.*Motilal*
+https://raghuvanshtechnologies.o18.click/c?o=21979987&m=7226&a=770082&sub_aff_id={replace_it}
+
+
+3.*Upstox app*
+https://uprisemedia.org/click?pub_id=165&camp_id=44&source=6567
+
+
+4.*Coin switch*
+https://uprisemedia.org/click?pub_id=165&camp_id=53&source=6567
+
+
+5.*Stocko*
+https://uprisemedia.org/click?pub_id=165&camp_id=29&source=6567
+
+
+6.*Airtel payment bank*
+https://uprisemedia.org/click?pub_id=165&camp_id=11&source=6567
+
+
+7.*Groww*
+https://uprisemedia.org/click?pub_id=165&camp_id=26&source=6567
+
+
+8.*Axis mf*
+https://digitaltask.oktrack.in/click?camp_id=21&pub_id=673837
+
+
+9.*Bajaj Dt*
+https://nthdegree382028.o18a.com/c?o=21999075&m=29111&a=770443&sub_aff_id={replace_it}
+
+User Details:
+Name: ${name}
+Mobile: ${mobile}`;
+
+                setTimeout(() => {
+                    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(customWhatsappText)}`;
+                }, 1200);
+
+            } catch (error) {
+                console.error(error);
+                statusMessage.textContent = "⚠️ WhatsApp पर रीडायरेक्ट किया जा रहा है...";
+                statusMessage.className = "mt-4 text-center text-sm text-amber-400 font-medium";
+                statusMessage.classList.remove('hidden');
+
+                const customWhatsappText =
+`August  Month Live Campaign 
+
+1.*Angel one*
+https://a.aonelink.in/ANGOne/NesCqGH?utm_source=youtube&utm_medium=ajay&utm_campaign=ajay
+
+
+2.*Motilal*
+https://raghuvanshtechnologies.o18.click/c?o=21979987&m=7226&a=770082&sub_aff_id={replace_it}
+
+
+3.*Upstox app*
+https://uprisemedia.org/formlie?form_id=FB1A95CD&pub_id=165
+
+4.*Hdfc sky*
+https://uprisemedia.org/formlie?form_id=CEE4EF9E&pub_id=165
+
+
+5.*Stocko*
+https://uprisemedia.org/formlie?form_id=2441C271&pub_id=165
+
+6.*Airtel payment bank*
+https://uprisemedia.org/formlie?form_id=E98C306D&pub_id=165
+
+7.*Groww*
+https://uprisemedia.org/formlie?form_id=CE409177&pub_id=165
+
+8.*Bajaj Dt*
+https://nthdegree382028.o18a.com/c?o=21999075&m=29111&a=770443&sub_aff_id={replace_it}
+
+9.*Choice*
+https://choiceindia.com/register?refercode=QzAwNTAyNDM=&source=Q0hPSUNFX0NPTk5FQ1Q=&subref=NzcwMDgy
+
+User Details:
+Name: ${name}
+Mobile: ${mobile}`;
+
+                setTimeout(() => {
+                    window.location.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(customWhatsappText)}`;
+                }, 1500);
+            } finally {
+                submitBtn.disabled = false;
+                btnText.textContent = "सबमिट करें & WhatsApp पर जाएँ";
+                loader.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
